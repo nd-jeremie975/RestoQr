@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USSD Launcher</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+         :root {
+            --bg: #090d16;
+            --surface: #111827;
+            --surface2: #19263a;
+            --border: #26344a;
+            --text: #f1f5fc;
+            --muted: #8998ad;
+            --blue: #4788ff;
+            --green: #36c994;
+            --red: #f16e7b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            padding: 30px 18px;
+            background: radial-gradient(ellipse at 80% 0%, #142c5038, transparent 40%), var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+        }
+        
+        button,
+        input {
+            font: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1080px;
+            margin: auto;
+        }
+        /* HEADER */
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 65px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #4788ff, #2857c7);
+            font-size: 22px;
+            font-weight: 800;
+        }
+        
+        .brand h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px;
+        }
+        
+        .brand p {
+            color: var(--muted);
+            font-size: 11px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--green);
+            font-size: 12px;
+            padding: 9px 13px;
+            border: 1px solid #36c99425;
+            border-radius: 30px;
+        }
+        
+        .status span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+        /* INTRO */
+        
+        .intro {
+            text-align: center;
+            margin-bottom: 42px;
+        }
+        
+        .eyebrow {
+            color: #75a6ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 17px;
+        }
+        
+        .intro h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            letter-spacing: -2px;
+            line-height: 1.12;
+        }
+        
+        .intro h1 span {
+            color: #75a6ff;
+        }
+        
+        .intro p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        /* SEARCH */
+        
+        .search-panel {
+            max-width: 650px;
+            margin: auto;
+            padding: 25px;
+            background: linear-gradient(145deg, #151f30, #101827);
+            border: 1px solid var(--border);
+            border-radius: 19px;
+        }
+        
+        .search-panel label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 11px;
+            font-weight: 600;
+        }
+        
+        .search-line {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input {
+            min-width: 0;
+            outline: none;
+            color: white;
+            background: #090f1b;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0 14px;
+        }
+        
+        input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px #4788ff18;
+        }
+        
+        .search-line input {
+            flex: 1;
+            height: 53px;
+            text-transform: uppercase;
+        }
+        
+        .primary-btn {
+            padding: 0 22px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        
+        .primary-btn:hover {
+            background: #3476ed;
+        }
+        
+        .hint {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 12px;
+        }
+        /* SEARCH RESULT */
+        
+        .result {
+            max-width: 650px;
+            margin: 14px auto 0;
+            padding: 17px 19px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-top {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .result strong {
+            color: #75a6ff;
+            font-size: 14px;
+        }
+        
+        .ussd-value {
+            display: block;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 12px 0;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 9px;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: white;
+            background: var(--surface2);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .launch-btn {
+            background: var(--green);
+            color: #071c15;
+            border: none;
+        }
+        /* PALETTE */
+        
+        .palette-section {
+            margin-top: 65px;
+        }
+        
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .section-head h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 21px;
+        }
+        
+        .section-head p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .add-btn {
+            padding: 11px 16px;
+            background: #172b49;
+            border: 1px solid #31558b;
+            border-radius: 9px;
+            color: #83b2ff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .palette-tools input {
+            width: 100%;
+            max-width: 320px;
+            height: 42px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .code-card {
+            padding: 20px;
+            background: linear-gradient(145deg, #141e2e, #101725);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            transition: .2s;
+        }
+        
+        .code-card:hover {
+            transform: translateY(-3px);
+            border-color: #456b9f;
+        }
+        
+        .card-top,
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .code-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 7px;
+        }
+        
+        .icon-btn {
+            width: 29px;
+            height: 29px;
+            background: #1b293b;
+            color: #a9bad2;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+        }
+        
+        .icon-btn:hover {
+            color: white;
+            border-color: var(--blue);
+        }
+        
+        .description {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        
+        .card-ussd {
+            font-size: 21px;
+            font-weight: 700;
+            margin: 19px 0;
+        }
+        
+        .card-bottom span {
+            font-size: 10px;
+            color: var(--muted);
+        }
+        
+        .card-launch {
+            background: #4788ff18;
+            border: 1px solid #4788ff45;
+            color: #83b2ff;
+            border-radius: 7px;
+            padding: 9px 14px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .card-launch:hover {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .empty {
+            grid-column: 1/-1;
+            padding: 45px 15px;
+            border: 1px dashed var(--border);
+            border-radius: 13px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        /* MODAL */
+        
+        dialog {
+            width: min(430px, calc(100% - 30px));
+            margin: auto;
+            padding: 25px;
+            background: #131e2e;
+            color: white;
+            border: 1px solid #30425e;
+            border-radius: 16px;
+        }
+        
+        dialog::backdrop {
+            background: #000a;
+            backdrop-filter: blur(5px);
+        }
+        
+        dialog h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 7px;
+        }
+        
+        .modal-subtitle {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 22px;
+        }
+        
+        .field {
+            margin-bottom: 15px;
+        }
+        
+        .field label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #bac6d7;
+        }
+        
+        .field input {
+            width: 100%;
+            height: 46px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 23px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            height: 43px;
+        }
+        
+        .cancel-btn {
+            background: #202d40;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: white;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 65px;
+            padding-top: 20px;
+            border-top: 1px solid #1c293b;
+            color: #65748a;
+            font-size: 11px;
+        }
+        
+        @media(max-width:750px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media(max-width:480px) {
+            body {
+                padding: 20px 14px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            header {
+                margin-bottom: 45px;
+            }
+            .search-panel {
+                padding: 17px;
+            }
+            .search-line {
+                flex-direction: column;
+            }
+            .search-line input,
+            .primary-btn {
+                height: 48px;
+            }
+            .section-head h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="brand">
+                <div class="brand-icon">U</div>
+                <div>
+                    <h2>USSD Launcher</h2>
+                    <p>Quick access system</p>
+                </div>
+            </div>
+
+            <div class="status">
+                <span></span> Local system
+            </div>
+        </header>
+
+        <section class="intro">
+            <div class="eyebrow">USSD MANAGEMENT SYSTEM</div>
+            <h1>Vos codes.<br><span>En un clic.</span></h1>
+            <p>Recherchez, organisez et lancez vos codes USSD rapidement.</p>
+        </section>
+
+        <!-- RECHERCHE -->
+
+        <section class="search-panel">
+
+            <label for="codeInput">ENTRER UN CODE DE RÉFÉRENCE</label>
+
+            <div class="search-line">
+                <input type="text" id="codeInput" placeholder="Ex : C01, C11..." autocomplete="off">
+
+                <button class="primary-btn" onclick="searchCode()">
+            Rechercher
+        </button>
+            </div>
+
+            <p class="hint">
+                Saisissez une référence pour retrouver le code USSD associé.
+            </p>
+
+        </section>
+
+        <div class="result" id="result">
+            <div class="result-top">
+                <strong id="resultName"></strong>
+                <span style="color:var(--green);font-size:11px">Code trouvé</span>
+            </div>
+
+            <span class="ussd-value" id="resultUSSD"></span>
+
+            <div class="result-actions">
+                <button class="action-btn launch-btn" id="resultLaunch">
+            Lancer le USSD
+        </button>
+                <button class="action-btn" id="resultCopy">
+            Copier
+        </button>
+            </div>
+        </div>
+
+        <!-- PALETTE -->
+
+        <section class="palette-section">
+
+            <div class="section-head">
+                <div>
+                    <h2>Ma palette USSD</h2>
+                    <p id="counter"></p>
+                </div>
+
+                <button class="add-btn" onclick="openModal()">
+            + Ajouter un code
+        </button>
+            </div>
+
+            <div class="palette-tools">
+                <input type="search" id="filterInput" placeholder="Rechercher dans la palette..." oninput="renderPalette()">
+            </div>
+
+            <div class="grid" id="palette"></div>
+
+        </section>
+
+        <footer>
+            USSD LAUNCHER · Gestion locale de vos codes
+        </footer>
+
+    </div>
+
+    <!-- FORMULAIRE -->
+
+    <dialog id="codeModal">
+
+        <h2 id="modalTitle">Nouveau code</h2>
+
+        <p class="modal-subtitle">
+            Enregistrez une référence et son code USSD associé.
+        </p>
+
+        <form id="codeForm">
+
+            <div class="field">
+                <label for="refInput">Code de référence</label>
+                <input type="text" id="refInput" placeholder="Ex : C01" required>
+            </div>
+
+            <div class="field">
+                <label for="descInput">Description (facultatif)</label>
+                <input type="text" id="descInput" placeholder="Ex : Consultation de solde">
+            </div>
+
+            <div class="field">
+                <label for="ussdInput">Code USSD</label>
+                <input type="text" id="ussdInput" placeholder="Ex : *123# ou #123#" required>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" onclick="closeModal()">
+                Annuler
+            </button>
+
+                <button type="submit" class="primary-btn">
+                Enregistrer
+            </button>
+            </div>
+
+        </form>
+    </dialog>
+
+    <script>
+        // ===================================
+        // 1. CODES PRÉENREGISTRÉS
+        // ===================================
+
+        const STORAGE_KEY = "ussd_launcher_codes";
+
+
+        const defaultCodes = [
+
+            // =========================
+            // MTN CAMEROON
+            // =========================
+
+            {
+                id: "mtn01",
+                reference: "M01",
+                description: "MTN - Menu des services",
+                ussd: "*123#"
+            }, {
+                id: "mtn02",
+                reference: "M02",
+                description: "MTN - Consultation du solde",
+                ussd: "*155#"
+            }, {
+                id: "mtn03",
+                reference: "M03",
+                description: "MTN - Solde bonus",
+                ussd: "*159*2#"
+            }, {
+                id: "mtn04",
+                reference: "M04",
+                description: "MTN - Solde Internet",
+                ussd: "*147*9#"
+            }, {
+                id: "mtn05",
+                reference: "M05",
+                description: "MTN - MTN Mobile Money",
+                ussd: "*126*1#"
+            }, {
+                id: "mtn06",
+                reference: "M06",
+                description: "MTN - Forfaits Internet",
+                ussd: "*123*4*2#"
+            }, {
+                id: "mtn07",
+                reference: "M07",
+                description: "MTN - Forfait WhatsApp",
+                ussd: "*701#"
+            }, {
+                id: "mtn08",
+                reference: "M08",
+                description: "MTN - Connaître son numéro et forfait",
+                ussd: "*170*0#"
+            },
+
+            // =========================
+            // ORANGE CAMEROON
+            // =========================
+
+            {
+                id: "orange01",
+                reference: "O01",
+                description: "Orange - Menu des services",
+                ussd: "#111#"
+            }, {
+                id: "orange02",
+                reference: "O02",
+                description: "Orange - Consultation du solde",
+                ussd: "#123#"
+            }, {
+                id: "orange03",
+                reference: "O03",
+                description: "Orange - Connaître son numéro",
+                ussd: "#99#"
+            }, {
+                id: "orange04",
+                reference: "O04",
+                description: "Orange - Orange Money",
+                ussd: "#150#"
+            }, {
+                id: "orange05",
+                reference: "O05",
+                description: "Orange - SOS crédit",
+                ussd: "#133#"
+            }, {
+                id: "orange06",
+                reference: "O06",
+                description: "Orange - Forfaits Internet",
+                ussd: "#145*2#"
+            }, {
+                id: "orange07",
+                reference: "O07",
+                description: "Orange - Solde Internet",
+                ussd: "#145*1#"
+            }, {
+                id: "orange08",
+                reference: "O08",
+                description: "Orange - Pack SMS",
+                ussd: "#131*1#"
+            }, {
+                id: "orange09",
+                reference: "O09",
+                description: "Orange - Recharge par carte",
+                ussd: "*188*00000000000000#"
+            },
+
+            // =========================
+            // CAMTEL
+            // =========================
+
+            {
+                id: "camtel01",
+                reference: "T01",
+                description: "Camtel - Consultation du solde",
+                ussd: "*825*1#"
+            }, {
+                id: "camtel02",
+                reference: "T02",
+                description: "Camtel - Recharge par carte",
+                ussd: "*826*00000000000000#"
+            }
+
+        ];
+
+
+        let codes = [];
+
+        try {
+
+            // Fusionner les codes de base avec les codes déjà enregistrés
+            const existingIds = new Set(codes.map(code => code.id));
+
+            const missingCodes = defaultCodes.filter(
+                code => !existingIds.has(code.id)
+            );
+
+            codes = [...codes, ...missingCodes];
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(codes)
+            );
+
+        } catch (error) {
+            codes = defaultCodes;
+        }
+
+        let editingId = null;
+
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const reference = params.get('codeInput').trim().toUpperCase();
+
+            const result = document.getElementById("result");
+
+            const found = codes.find(
+                item => item.reference.toUpperCase() === reference
+            );
+
+            if (!found) {
+                result.classList.remove("show");
+                alert("Aucun code correspondant à " + reference);
+                //return 0;
+            }
+
+            document.getElementById("resultName").textContent =
+                found.reference + (
+                    found.description ?
+                    " — " + found.description :
+                    ""
+                );
+
+            document.getElementById("resultUSSD").textContent =
+                found.ussd;
+
+            document.getElementById("resultLaunch").onclick =
+                () => launchUSSD(found.ussd);
+
+            document.getElementById("resultCopy").onclick =
+                () => copyUSSD(found.ussd);
+
+            result.classList.add("show");
+        } catch (error) {
+            console.log("Rien dans l'url ");
+        }
+
+
+        // ===================================
+        // 2. SAUVEGARDE
+        // ===================================
+
+        function saveCodes() {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(codes)
+            );
+
+            renderPalette();
+        }
+
+        // ===================================
+        // 3. VALIDATION DU FORMAT USSD
+        // ===================================
+
+        function isValidUSSD(ussd) {
+
+            /*
+              Formats acceptés :
+
+              *123#
+              *123*1#
+              #123#
+              #123*1#
+
+              Formats refusés :
+
+              123#
+              *123
+              ##123#
+              *ABC#
+            */
+
+            return /^(\*[0-9*]+#|#[0-9*]+#)$/.test(ussd);
+        }
+
+        // ===================================
+        // 4. RECHERCHE
+        // ===================================
+
+        function searchCode() {
+            const reference = document
+                .getElementById("codeInput")
+                .value.trim().toUpperCase();
+
+            const result = document.getElementById("result");
+
+            if (!reference) {
+                alert("Veuillez entrer une référence.");
+                return;
+            }
+
+            const found = codes.find(
+                item => item.reference.toUpperCase() === reference
+            );
+
+            if (!found) {
+                result.classList.remove("show");
+                alert("Aucun code correspondant à " + reference);
+                return;
+            }
+
+            document.getElementById("resultName").textContent =
+                found.reference + (
+                    found.description ?
+                    " — " + found.description :
+                    ""
+                );
+
+            document.getElementById("resultUSSD").textContent =
+                found.ussd;
+
+            document.getElementById("resultLaunch").onclick =
+                () => launchUSSD(found.ussd);
+
+            document.getElementById("resultCopy").onclick =
+                () => copyUSSD(found.ussd);
+
+            result.classList.add("show");
+        }
+
+        document.getElementById("codeInput").addEventListener(
+            "keydown",
+            event => {
+                if (event.key === "Enter") searchCode();
+            }
+        );
+
+        // ===================================
+        // 5. LANCEMENT USSD
+        // ===================================
+
+        function launchUSSD(ussd) {
+
+            if (!isValidUSSD(ussd)) {
+                alert("Ce code USSD n'est pas valide.");
+                return;
+            }
+
+            if (!confirm(
+                    "Ouvrir le composeur téléphonique avec :\n" + ussd
+                )) {
+                return;
+            }
+
+            window.location.href =
+                "tel:" + encodeURIComponent(ussd);
+        }
+
+        // ===================================
+        // 6. COPIE
+        // ===================================
+
+        async function copyUSSD(ussd) {
+
+            try {
+                await navigator.clipboard.writeText(ussd);
+                alert("Code copié : " + ussd);
+
+            } catch (error) {
+                alert("Impossible de copier le code.");
+            }
+        }
+
+        // ===================================
+        // 7. AFFICHAGE DE LA PALETTE
+        // ===================================
+
+        function renderPalette() {
+
+            const palette = document.getElementById("palette");
+
+            const filter = document
+                .getElementById("filterInput")
+                .value.trim().toLowerCase();
+
+            const filtered = codes.filter(item =>
+                item.reference.toLowerCase().includes(filter) ||
+                item.ussd.toLowerCase().includes(filter) ||
+                item.description.toLowerCase().includes(filter)
+            );
+
+            document.getElementById("counter").textContent =
+                codes.length + (
+                    codes.length > 1 ?
+                    " codes enregistrés" :
+                    " code enregistré"
+                );
+
+            palette.innerHTML = "";
+
+            if (filtered.length === 0) {
+
+                palette.innerHTML = `
+            <div class="empty">
+                Aucun code trouvé.
+            </div>
+        `;
+
+                return;
+            }
+
+            filtered.forEach(item => {
+
+                const card = document.createElement("div");
+                card.className = "code-card";
+
+                const top = document.createElement("div");
+                top.className = "card-top";
+
+                const name = document.createElement("div");
+                name.className = "code-label";
+                name.textContent = item.reference;
+
+                const actions = document.createElement("div");
+                actions.className = "card-actions";
+
+                const editBtn = document.createElement("button");
+                editBtn.className = "icon-btn";
+                editBtn.textContent = "✎";
+                editBtn.title = "Modifier";
+                editBtn.onclick = () => editCode(item.id);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "icon-btn";
+                deleteBtn.textContent = "×";
+                deleteBtn.title = "Supprimer";
+                deleteBtn.onclick = () => deleteCode(item.id);
+
+                actions.append(editBtn, deleteBtn);
+                top.append(name, actions);
+
+                const description = document.createElement("p");
+                description.className = "description";
+                description.textContent =
+                    item.description || "Sans description";
+
+                const ussd = document.createElement("div");
+                ussd.className = "card-ussd";
+                ussd.textContent = item.ussd;
+
+                const bottom = document.createElement("div");
+                bottom.className = "card-bottom";
+
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "action-btn";
+                copyBtn.textContent = "Copier";
+                copyBtn.onclick = () => copyUSSD(item.ussd);
+
+                const launchBtn = document.createElement("button");
+                launchBtn.className = "card-launch";
+                launchBtn.textContent = "Lancer →";
+                launchBtn.onclick = () => launchUSSD(item.ussd);
+
+                bottom.append(copyBtn, launchBtn);
+
+                card.append(top, description, ussd, bottom);
+
+                palette.appendChild(card);
+            });
+        }
+
+        // ===================================
+        // 8. GESTION DU FORMULAIRE
+        // ===================================
+
+        function openModal() {
+
+            editingId = null;
+
+            document.getElementById("codeForm").reset();
+
+            document.getElementById("modalTitle").textContent =
+                "Nouveau code";
+
+            document.getElementById("codeModal").showModal();
+        }
+
+        function closeModal() {
+            document.getElementById("codeModal").close();
+        }
+
+        // ===================================
+        // 9. AJOUT ET MODIFICATION
+        // ===================================
+
+        document.getElementById("codeForm").addEventListener(
+            "submit",
+            event => {
+
+                event.preventDefault();
+
+                const reference = document
+                    .getElementById("refInput")
+                    .value.trim().toUpperCase();
+
+                const description = document
+                    .getElementById("descInput")
+                    .value.trim();
+
+                const ussd = document
+                    .getElementById("ussdInput")
+                    .value.trim();
+
+                // Vérifier la référence
+                if (!/^C\d+$/i.test(reference)) {
+                    alert("Référence invalide. Exemple : C01 ou C11.");
+                    return;
+                }
+
+                // Vérifier le code USSD
+                if (!isValidUSSD(ussd)) {
+                    alert(
+                        "Format USSD invalide.\n\n" +
+                        "Formats acceptés :\n" +
+                        "*123#\n" +
+                        "*123*1#\n" +
+                        "#123#\n" +
+                        "#123*1#"
+                    );
+                    return;
+                }
+
+                // Éviter les doublons
+                const duplicate = codes.find(item =>
+                    item.reference === reference &&
+                    item.id !== editingId
+                );
+
+                if (duplicate) {
+                    alert("Cette référence existe déjà.");
+                    return;
+                }
+
+                if (editingId !== null) {
+
+                    const index = codes.findIndex(
+                        item => item.id === editingId
+                    );
+
+                    if (index !== -1) {
+
+                        codes[index] = {
+                            ...codes[index],
+                            reference,
+                            description,
+                            ussd
+                        };
+                    }
+
+                } else {
+
+                    codes.push({
+                        id: Date.now().toString(),
+                        reference,
+                        description,
+                        ussd
+                    });
+
+                }
+
+                saveCodes();
+
+                closeModal();
+
+                document.getElementById("result").classList.remove("show");
+            }
+        );
+
+        // ===================================
+        // 10. MODIFIER UN CODE
+        // ===================================
+
+        function editCode(id) {
+
+            const item = codes.find(code => code.id === id);
+
+            if (!item) return;
+
+            editingId = id;
+
+            document.getElementById("modalTitle").textContent =
+                "Modifier le code";
+
+            document.getElementById("refInput").value =
+                item.reference;
+
+            document.getElementById("descInput").value =
+                item.description;
+
+            document.getElementById("ussdInput").value =
+                item.ussd;
+
+            document.getElementById("codeModal").showModal();
+        }
+
+        // ===================================
+        // 11. SUPPRIMER UN CODE
+        // ===================================
+
+        function deleteCode(id) {
+
+            const item = codes.find(code => code.id === id);
+
+            if (!item) return;
+
+            if (!confirm(
+                    "Voulez-vous supprimer " + item.reference + " ?"
+                )) {
+                return;
+            }
+
+            codes = codes.filter(code => code.id !== id);
+
+            saveCodes();
+
+            document.getElementById("result").classList.remove("show");
+        }
+
+        // ===================================
+        // 12. INITIALISATION
+        // ===================================
+
+        if (localStorage.getItem(STORAGE_KEY) === null) {
+            saveCodes();
+        } else {
+            renderPalette();
+        }
+    </script>
+
+</body>
+
+</html>
