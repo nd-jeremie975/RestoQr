@@ -783,24 +783,24 @@
                 alert("Aucun code correspondant à " + reference);
                 //return 0;
             }
+            ussd = found.ussd;
 
-            document.getElementById("resultName").textContent =
-                found.reference + (
-                    found.description ?
-                    " — " + found.description :
-                    ""
-                );
+            if (!isValidUSSD(ussd)) {
+                alert("Ce code USSD n'est pas valide.");
+                //return;
+            }
 
-            document.getElementById("resultUSSD").textContent =
-                found.ussd;
+            if (!confirm(
+                    "Ouvrir le composeur téléphonique avec :\n" + ussd
+                )) {
+                //return;
+            }
 
-            document.getElementById("resultLaunch").onclick =
-                () => launchUSSD(found.ussd);
+            window.location.href =
+                "tel:" + encodeURIComponent(ussd);
 
-            document.getElementById("resultCopy").onclick =
-                () => copyUSSD(found.ussd);
 
-            result.classList.add("show");
+
         } catch (error) {
             console.log("Rien dans l'url ");
         }
